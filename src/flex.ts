@@ -36,7 +36,7 @@ const factory = (prev: {_: FlexAttr & {[k: string]: string}}) => {
   return flex;
 };
 
-const getter = (obj: {_: FlexAttr}, prop: string) => {
+const getter = (obj: {_: FlexAttr & {[k: string]: string}}, prop: string) => {
   switch (prop) {
     case 'inline': {
       obj._.display = 'inline-flex';
@@ -59,8 +59,8 @@ const getFrom = (attr: FlexAttr & {[k: string]: string}) => (
   return attr[propname];
 };
 
-export default () => {
-  return new Proxy(
+export const flex = (IProxy = Proxy) => {
+  return new IProxy(
     {_: {...defaults}},
     {
       get: getter,

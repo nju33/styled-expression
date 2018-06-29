@@ -5,6 +5,9 @@
   "repository": "git@github.com:nju33/styled-expression.git",
   "author": "nju33 <nju33.ki@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "build": "microbundle -i src/index.ts -o dist/index.js"
+  },
   "peerDependencies": {
     "styled-components": "^3.3.3"
   },
@@ -13,6 +16,7 @@
     "@types/react": "^16.4.5",
     "@types/react-dom": "^16.0.6",
     "@types/webpack": "^4.4.4",
+    "microbundle": "^0.4.4",
     "prettier": "^1.13.7",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
