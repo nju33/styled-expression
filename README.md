@@ -1,8 +1,12 @@
 # styled-expression
 
+## Storybook
+
+https://nju33.github.io/styled-expression/
+
 ## Note
 
-This does not work with IE 11 etc.
+This does not work with IE 11 etc because it uses the Proxy API.
 
 ## Install
 
