@@ -16,7 +16,7 @@ yarn add styled-components styled-expression
 
 ## Example
 
-```
+```ts
 import styled from 'styled-components';
 import {flex} from 'styled-expression';
 
