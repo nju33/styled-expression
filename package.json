@@ -1,6 +1,6 @@
 {
   "name": "styled-expression",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "evacuation-dist/index.js",
   "types": "evacuation-dist/index.d.ts",
   "repository": "nju33/styled-expression",
