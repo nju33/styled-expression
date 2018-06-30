@@ -1,69 +1,96 @@
 import {css, FlattenInterpolation, ThemeProps} from 'styled-components';
+import {createExpression, CreateStyle, Dictionary, Getter} from './expression';
 
-export type Expression = () => FlattenInterpolation<ThemeProps<any>>[];
-
-export interface ExpressionProp {
-  _: FlexAttr & {[k: string]: string};
+interface FlexAttribute extends Dictionary {
+  display?: string;
+  flexDirection?: string;
+  flexWrap?: string;
+  justifyContent?: string;
+  alignItems?: string;
 }
 
-export interface FlexAttr {
-  display: string;
-  flexDirection: string;
-  flexWrap: string;
-  justifyContent: string;
-  alignItems: string;
-}
-
-const defaults: FlexAttr = {
+const defaults = {
   display: 'flex',
-  flexDirection: 'row',
-  flexWrap: 'nowrap',
-  justifyContent: 'flex-start',
-  alignItems: 'stretch',
 };
 
-const factory = (prev: {_: FlexAttr & {[k: string]: string}}) => {
-  const flex: Expression = function() {
-    const getAttr = getFrom((flex as any)._ || {...defaults});
-    return css`
-      display: ${getAttr('display')};
-      justify-content: ${getAttr('justifyContent')};
-    `;
-  };
-
-  (flex as any)._ = prev._;
-
-  return flex;
-};
-
-const getter = (obj: {_: FlexAttr & {[k: string]: string}}, prop: string) => {
-  switch (prop) {
-    case 'inline': {
-      obj._.display = 'inline-flex';
-      break;
-    }
-    case 'center': {
-      obj._.justifyContent = 'center';
-      obj._.alignItems = 'center';
-    }
-    default:
-      break;
-  }
-
-  return factory(obj);
-};
-
-const getFrom = (attr: FlexAttr & {[k: string]: string}) => (
+const getFrom = <T extends FlexAttribute>(attr: T & Dictionary) => (
   propname: string,
 ) => () => {
   return attr[propname];
 };
 
-export const flex = (IProxy = Proxy) => {
-  return new IProxy(
-    {_: {...defaults}},
-    {
-      get: getter,
-    },
-  );
+export const createStyle: CreateStyle<FlexAttribute> = attr => {
+  const getAttr = getFrom(attr);
+
+  return css`
+    display: ${getAttr('display')};
+    flex-direction: ${getAttr('flexDirection')};
+    justify-content: ${getAttr('justifyContent')};
+    align-items: ${getAttr('alignItems')};
+  `;
 };
+
+export function expression<T extends FlexAttribute & Dictionary>(attr: T) {}
+export namespace expression {
+  export let attr: Dictionary = {};
+}
+
+const getter: Getter<FlexAttribute> = (fn, prop) => {
+  switch (prop) {
+    case '_': {
+      break;
+    }
+    case 'inline': {
+      fn.attrs.display = 'inline-flex';
+      break;
+    }
+    case 'column': {
+      fn.attrs.flexDirection = 'column';
+      if (fn.attrs.justifyContent === 'center' || fn.attrs.alignItems !== 'center') {
+        delete fn.attrs.justifyContent;
+        fn.attrs.alignItems = 'center';
+      }
+      break;
+    }
+    case 'center': {
+      fn.attrs.justifyContent = 'center';
+      fn.attrs.alignItems = 'center';
+      break;
+    }
+    case 'xCenter': {
+      if (fn.attrs.flexDirection === 'column') {
+        fn.attrs.alignItems = 'center';
+        delete fn.attrs.justifyContent;
+      } else {
+        fn.attrs.justifyContent = 'center';
+        delete fn.attrs.alignItems;
+      }
+      break;
+    }
+    case 'yCenter': {
+      if (fn.attrs.flexDirection === 'column') {
+        fn.attrs.justifyContent = 'center';
+        delete fn.attrs.alignItems;
+      } else {
+        fn.attrs.alignItems = 'center';
+        delete fn.attrs.justifyContent;
+      }
+      break;
+    }
+    default:
+      break;
+  }
+
+  return new Proxy(fn, {
+    get: getter,
+  });
+};
+
+export const flex = (createExpression(
+  createStyle,
+  defaults,
+  getter,
+) as any) as () => Record<
+  '_' | 'inline' | 'center' | 'xCenter' | 'yCenter' | 'column',
+  any
+>;
