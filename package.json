@@ -7,8 +7,10 @@
   "author": "nju33 <nju33.ki@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "tets": ":",
     "prepare": "yarn build && yarn build-storybook",
-    "build": "microbundle -i src/index.ts -o dist/index.js",
+    "_build": "microbundle -i src/index.ts -o dist/index.js",
+    "build": "tsc",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook -o docs"
   },
